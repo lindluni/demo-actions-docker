@@ -1,0 +1,17 @@
+name: Publish Image
+on:
+  create:
+    tags:
+      - v*.*.*
+jobs:
+  publish:
+    name: Build and Publish Image
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+      - name: Build and Push
+        run: |
+          docker login -u ${{ github.repository_owner }} -p ${{ secrets.CR_PAT }} ghcr.io
+          docker build -t ghcr.io/${{ github.repository }}:$(echo ${{ github.ref }} | tr -d 'refs/tags/v') .
+          docker push ghcr.io/${{ github.repository }}:$(echo ${{ github.ref }} | tr -d 'refs/tags/v')
